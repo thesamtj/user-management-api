@@ -9,6 +9,6 @@ namespace Service.Services
 {
     public interface IEmailService
     {
-        string SendEmail(Message message);
+        Task<string> SendEmail(Message message);
     }
 }

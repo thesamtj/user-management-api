@@ -14,10 +14,10 @@ namespace Service.Services
     {
         private readonly EmailConfiguration _emailConfig;
         public EmailService(EmailConfiguration emailConfig) => _emailConfig = emailConfig;
-        public string SendEmail(Message message)
+        public async Task<string> SendEmail(Message message)
         {
             var emailMessage = CreateEmailMessage(message);
-            Send(emailMessage);
+            await Send(emailMessage);
             var recipients = string.Join(", ", message.To);
             return ResponseMessages.GetEmailSuccessMessage(recipients);
         }
@@ -33,16 +33,16 @@ namespace Service.Services
             return emailMessage;
         }
 
-        private void Send(MimeMessage mailMessage)
+        private async Task Send(MimeMessage mailMessage)
         {
             using var client = new SmtpClient();
             try
             {
                 client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
+                await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
 
-                client.Send(mailMessage);
+                await client.SendAsync(mailMessage);
             }
             catch
             {

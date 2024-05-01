@@ -19,10 +19,12 @@ namespace API.Controllers
         private readonly IEmailService _emailService;
         private readonly IUserManagement _user;
 
-        public AuthenticationController(UserManager<ApplicationUser> userManager,
+        public AuthenticationController(
+            UserManager<ApplicationUser> userManager,
             IEmailService emailService,
             IUserManagement user,
-            IConfiguration configuration)
+            IConfiguration configuration
+            )
         {
             _userManager = userManager;
             _emailService = emailService;
@@ -30,6 +32,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Route("RegisterUser")]
         public async Task<IActionResult> Register([FromBody] RegisterUser registerUser)
         {
             var tokenResponse = await _user.CreateUserWithTokenAsync(registerUser);
@@ -41,7 +44,7 @@ namespace API.Controllers
                 var confirmationLink = Url.Action(nameof(ConfirmEmail), "Authentication", new { tokenResponse.Response.Token, email = registerUser.Email }, Request.Scheme);
 
                 var message = new Message(new string[] { registerUser.Email! }, "Confirmation email link", confirmationLink!);
-                var responseMsg = _emailService.SendEmail(message);
+                var responseMsg = await _emailService.SendEmail(message);
                 return StatusCode(StatusCodes.Status200OK,
                         new Response { IsSuccess = true, Message = $"{tokenResponse.Message} {responseMsg}" });
 
@@ -69,7 +72,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Route("login")]
+        [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             var loginOtpResponse = await _user.GetOtpByLoginAsync(loginModel);
@@ -80,7 +83,7 @@ namespace API.Controllers
                 {
                     var token = loginOtpResponse.Response.Token;
                     var message = new Message(new string[] { user.Email! }, "OTP Confrimation", token);
-                    _emailService.SendEmail(message);
+                    await _emailService.SendEmail(message);
 
                     return StatusCode(StatusCodes.Status200OK,
                      new Response { IsSuccess = loginOtpResponse.IsSuccess, Status = "Success", Message = $"We have sent an OTP to your Email {user.Email}" });
@@ -97,7 +100,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Route("login-2FA")]
+        [Route("Login-2FA")]
         public async Task<IActionResult> LoginWithOTP(string code, string userName)
         {
             var jwt = await _user.LoginUserWithJWTokenAsync(code, userName);

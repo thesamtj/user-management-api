@@ -8,10 +8,10 @@ namespace API.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        [HttpGet("employees")]
+        [HttpGet("Employees")]
         public IEnumerable<string> Get()
         {
-            return new List<string> { "Ahmed", "Ali", "Ahsan" };
+            return new List<string> { "John", "Peter", "James" };
         }
     }
 }

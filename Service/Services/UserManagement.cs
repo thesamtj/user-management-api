@@ -67,6 +67,8 @@ namespace Service.Services
             {
                 return new ApiResponse<CreateUserResponse> { IsSuccess = false, StatusCode = 403, Message = "User already exists!" };
             }
+
+            // Add the User in the database
             ApplicationUser user = new()
             {
                 Email = registerUser.Email,

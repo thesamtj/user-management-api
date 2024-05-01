@@ -84,8 +84,9 @@ builder.Services.AddAuthentication(options =>
 //Add Email Configs
 var emailConfig = configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
 builder.Services.AddSingleton(emailConfig);
+// builder.Services.Configure<EmailConfiguration>(configuration.GetSection("EmailConfiguration"));
 
-builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserManagement, UserManagement>();
 
 builder.Services.AddControllers();
